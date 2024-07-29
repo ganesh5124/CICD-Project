@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+    stages {
+        stage ('BuildingJar') {
+            steps {
+                sh 'mvn clean package -f Application/pom.xml'
+                
+            }
+        }
+        stage ('Building Docker Image'){
+            steps {
+                sh 'cd Application && docker build -t devopshubg333/japp:v1 .'
+                sh 'docker login -u devopshubg333 -p Callidus21!@'
+                sh 'docker push devopshubg333/japp:v1'
+            }
+        }
+    }
+}
+
+
+sonartoken
+squ_fb2d795f0b380730616acab72061de6da40fb071
