@@ -1,5 +1,5 @@
 ---
-- name: Deploy Application into eks cluster 
+- name: Deploy Application into EKS cluster
   hosts: all  # Replace with your target Kubernetes master host or group
   gather_facts: false  # No need to gather facts for this playbook
   become: true
@@ -8,8 +8,9 @@
     - name: Copy playbook.yaml file to eks cluster
       copy:
         src: /var/lib/jenkins/workspace/cicd-project/Ansible/playbook.yaml  # Assuming Jenkins workspace variable
-        dest: /etc/ansible/playbooks
+        dest: /etc/ansible/playbooks/playbook.yaml  # Including the filename
 
     - name: Apply Deployment
-      ansible.builtin.command: kubectl apply -f /etc/ansible/playbooks/playbook.yaml
-    
+      ansible.builtin.command:
+        cmd: kubectl apply -f /etc/ansible/playbooks/playbook.yaml
+        chdir: /etc/ansible/playbooks  # Optional: set working directory
