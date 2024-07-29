@@ -7,8 +7,8 @@
     - name: Copy k8s_deployment.yaml file to eks cluster
       copy:
         src: /var/lib/jenkins/workspace/cicd/Ansible/playbook.yaml  # Assuming Jenkins workspace variable
-        dest: /home/ec2-user/
+        dest: /etc/ansible/playbooks
 
     - name: Apply Deployment
-      ansible.builtin.command: kubectl apply -f /home/ec2-user/k8s_deployment.yaml
+      ansible.builtin.command: kubectl apply -f /etc/ansible/playbooks/playbook.yaml
     
