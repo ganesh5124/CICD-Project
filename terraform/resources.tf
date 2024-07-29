@@ -168,6 +168,7 @@ resource "aws_instance" "dev-jenkins-ec2-instance" {
       "sudo yum install maven git -y",
       "sudo yum install ansible -y",
       "sudo yum install docker -y",
+      "sudo chmod 666 /var/run/docker.sock",
       "sudo systemctl start docker",
       "sudo usermod -aG docker jenkns",
       "sudo usermod -aG docker $USER",

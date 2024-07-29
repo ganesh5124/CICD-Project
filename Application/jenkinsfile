@@ -1,22 +1,80 @@
-pipeline {
+ pipeline {
     agent any
+    environment {
+            GIT_REPO_NAME = "CICD-Project"
+            GIT_USER_NAME = "ganesh5124"
+            SONARQUBE_URL = "http://13.201.13.213:9000"
+            SONARQUBE_TOKEN = "squ_866f07edcfe080633bbf7ff819831c359e8d6bc8"
+        }
     stages {
-        stage ('BuildingJar') {
+       
+        stage('Checkout Code') {
             steps {
-                sh 'mvn clean package -f Application/pom.xml'
-                
+                echo 'scm git'
+                git branch: 'main', changelog: false, credentialsId: 'github-Id', poll: false, url: 'https://github.com/ganesh5124/CICD-Project.git'
             }
         }
-        stage ('Building Docker Image'){
+        stage('BuildingJar') {
             steps {
-                sh 'cd Application && docker build -t devopshubg333/japp:v1 .'
-                sh 'docker login -u devopshubg333 -p Callidus21!@'
-                sh 'docker push devopshubg333/japp:v1'
+                echo 'maven build'
+                sh 'cd Application && mvn clean package'
+            }
+        }
+        stage('sonar') {
+            steps {
+                echo 'scanning project'
+                sh 'ls -ltr'
+                sh '''cd Application && mvn sonar:sonar \\
+                      -Dsonar.host.url=${SONARQUBE_URL}\\
+                      -Dsonar.login=${SONARQUBE_TOKEN}'''
+            }
+    	}
+       stage('Build docker image'){
+            steps{
+                script{
+                    echo 'docker image build'
+					sh 'cd Application && docker build -t ganesh5124/webapp:${BUILD_NUMBER} .'
+                }
+            }
+        }
+       stage('docker image scan'){
+        steps{
+            sh "trivy image ganesh5124/webapp:${BUILD_NUMBER}"
+        }
+    }		
+		 stage('Push image to Hub'){
+            steps{
+                script{
+                   withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                   sh 'docker login -u ganesh5124 -p ${dockerhub}'
+              }
+                   sh 'docker push ganesh5124/webapp:${BUILD_NUMBER}'
+                }
+            }
+        }
+      stage('Update kubernetes Deployment manifest File') {
+        steps {
+            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                sh '''
+                    git config --global user.email "pvgkumar2001@gmail.com"
+                    git config --global user.name "ganesh5124"
+                    sed -i "s/webapp:.*/webapp:${BUILD_NUMBER}/g" "K8's/deploy.yaml"
+                    git add .
+                    git commit -m "Update deployment image tag to version ${BUILD_NUMBER}"
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
             }
         }
     }
+
+    stage('k8s Deployment using ansible'){
+            steps{
+              
+                    script{
+                        ansiblePlaybook credentialsId: 'ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/', playbook: 'Ansible/playbook.yaml'
+                }
+            }
+        }
+}
 }
 
-
-sonartoken
-squ_fb2d795f0b380730616acab72061de6da40fb071
