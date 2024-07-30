@@ -3,8 +3,9 @@
     environment {
             GIT_REPO_NAME = "CICD-Project"
             GIT_USER_NAME = "ganesh5124"
-            SONARQUBE_URL = "http://13.201.13.213:9000"
-            SONARQUBE_TOKEN = "squ_866f07edcfe080633bbf7ff819831c359e8d6bc8"
+            SONARQUBE_URL = "http://43.205.243.64:9000"
+            SONARQUBE_TOKEN = "squ_caea103628bf35ee265caea2e6c2393a1a1fd127"
+            ANSIBLE_HOST_KEY_CHECKING = 'False'
         }
     stages {
        
@@ -14,11 +15,11 @@
                 git branch: 'main', changelog: false, credentialsId: 'github-Id', poll: false, url: 'https://github.com/ganesh5124/CICD-Project.git'
             }
         }
-        stage('BuildingJar') {
-            steps {
-                echo 'maven build'
-                sh 'cd Application && mvn clean package'
-            }
+        stage('Build Artifact'){
+          steps {
+            echo 'install the package into the local repository'
+            sh 'cd Application && mvn clean install'
+          }
         }
         stage('sonar') {
             steps {
@@ -33,7 +34,7 @@
             steps{
                 script{
                     echo 'docker image build'
-					sh 'cd Application && docker build -t ganesh5124/webapp:${BUILD_NUMBER} .'
+					          sh 'cd Application && docker build -t ganesh5124/webapp:${BUILD_NUMBER} .'
                 }
             }
         }
@@ -71,10 +72,13 @@
             steps{
               
                     script{
-                        ansiblePlaybook credentialsId: 'ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/', playbook: 'Ansible/playbook.yaml'
-                }
+                              ansiblePlaybook credentialsId: 'ssh', 
+                                        disableHostKeyChecking: true, 
+                                        installation: 'ansible', 
+                                        inventory: '/etc/ansible/', 
+                                        playbook: 'Ansible/playbook.yaml'
+                        }
             }
         }
 }
 }
-
