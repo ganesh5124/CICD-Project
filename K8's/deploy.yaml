@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mc-app
-        image: ganesh5124/webapp:4
+        image: ganesh5124/webapp:5
         ports:
         - containerPort: 8080
  
