@@ -7,7 +7,7 @@
   tasks:
     - name: Copy playbook.yaml file to eks cluster
       copy:
-        src: /var/lib/jenkins/workspace/cicd-project/Ansible/playbook.yaml  # Assuming Jenkins workspace variable
+        src: /var/lib/jenkins/workspace/cicd-pipeline/Ansible  # Assuming Jenkins workspace variable
         dest: /etc/ansible/playbooks/playbook.yaml  # Including the filename
 
     - name: Apply Deployment
