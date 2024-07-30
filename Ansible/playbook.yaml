@@ -13,3 +13,6 @@
       ansible.builtin.command:
         cmd: kubectl apply -f /etc/ansible/playbooks/deploy.yaml
         chdir: /etc/ansible/playbooks  # Optional: set working directory
+        owner: root
+        group: root
+        mode: '0755'
