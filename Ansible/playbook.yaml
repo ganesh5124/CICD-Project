@@ -8,6 +8,9 @@
       copy:
         src: /var/lib/jenkins/workspace/cicd-pipeline/K8's/  # Assuming Jenkins workspace variable
         dest: /etc/ansible/playbooks/  # Including the filename
+        owner: root
+        group: root
+        mode: '0755'
 
     - name: Apply Deployment
       ansible.builtin.command:
